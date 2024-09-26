@@ -1,6 +1,14 @@
 #include "Protocol.h"
 
 
+Protocol::Protocol()
+{
+}
+
+Protocol::~Protocol()
+{
+}
+
 // Sends the command from host to device
 bool Protocol::SendCommand(EthernetDriver driver)
 {
@@ -19,4 +27,8 @@ void Protocol::RespondToCommand(EthernetDriver driver)
 void Protocol::Stream(EthernetDriver driver)
 {
     driver.StreamMessage(driver.GetSender());
+}
+
+void Protocol::HandleFrame()
+{
 }

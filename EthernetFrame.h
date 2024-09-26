@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ETHERNET_FRAME_H
+#define ETHERNET_FRAME_H
 
 #include <vector>
 #include <cstdint>
@@ -20,23 +21,18 @@ public:
     EthernetFrame(std::vector<uint8_t> preamble, uint8_t sfd, std::vector<uint8_t> destination, 
     std::vector<uint8_t> source, std::vector<uint8_t> length,uint32_t crc, std::vector<uint8_t> data);
 
-    EthernetFrame() {};
+    // EthernetFrame() {};
 
     uint32_t GetCRC() {return mCRC;}
-
+    uint8_t GetSFD() {return mSFD;}
     std::vector<uint8_t> GetData() {return mData;}
+    std::vector<uint8_t> GetDestination() {return mDestination;}
+    std::vector<uint8_t> GetSource() {return mSource;}
+    std::vector<uint8_t> GetLength() {return mLength;}
+    std::vector<uint8_t> GetPreamble() {return mPreamble;}
 
-    ~EthernetFrame();
+    // ~EthernetFrame();
 };
 
-EthernetFrame::EthernetFrame(std::vector<uint8_t> preamble, uint8_t sfd, std::vector<uint8_t> destination, 
-    std::vector<uint8_t> source, std::vector<uint8_t> length, uint32_t crc, std::vector<uint8_t> data) 
-    : mPreamble(preamble), mSFD(sfd), mDestination(destination), mSource(source), mLength(length), mCRC(crc), mData(data) 
-{
-    
-}
+#endif // ETHERNET_FRAME_H
 
-
-EthernetFrame::~EthernetFrame()
-{
-}

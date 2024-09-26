@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PROTOCOL_H
+#define PROTOCOL_H
 
 #include "EthernetDriver.h"
 
@@ -20,10 +21,5 @@ public:
     void HandleFrame();
 };
 
-Protocol::Protocol()
-{
-}
+#endif // PROTOCOL_H
 
-Protocol::~Protocol()
-{
-}

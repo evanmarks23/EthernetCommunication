@@ -5,12 +5,21 @@
 
 using namespace std;
 
+EthernetDriver::EthernetDriver()
+{
+
+}
+
+EthernetDriver::~EthernetDriver()
+{
+}
+
 // Generates random bytes for ethernet frame
-vector<uint8_t> EthernetDriver::ConstructBytes(unsigned char size)
+vector<uint8_t> EthernetDriver::ConstructBytes(unsigned char size, int seed)
 {
     random_device rd;
     mt19937 generator;
-    generator.seed(time(0));
+    generator.seed(seed);
     uniform_int_distribution<uint8_t> distribute(0, 255);
 
     vector<uint8_t> bytes;
@@ -24,16 +33,16 @@ vector<uint8_t> EthernetDriver::ConstructBytes(unsigned char size)
 }
 
 // Builds each part of the ethernet frame
-EthernetFrame EthernetDriver::ConstructFrame()
+std::shared_ptr<EthernetFrame> EthernetDriver::ConstructFrame(int seed)
 {
-    vector<uint8_t> preamble = ConstructBytes(7);
+    vector<uint8_t> preamble = ConstructBytes(7, seed);
     uint8_t sfd = 0xAB;
-    vector<uint8_t> destination = ConstructBytes(6);
-    vector<uint8_t> source = ConstructBytes(6);
+    vector<uint8_t> destination = ConstructBytes(6, seed);
+    vector<uint8_t> source = ConstructBytes(6, seed);
     
-    vector<uint8_t> length = ConstructBytes(2);
+    vector<uint8_t> length = ConstructBytes(2, seed);
 
-    vector<uint8_t> data = ConstructBytes(length[0] + length[1]);
+    vector<uint8_t> data = ConstructBytes(length[0] + length[1], seed);
 
     uint32_t crc = 0;
 
@@ -52,19 +61,18 @@ EthernetFrame EthernetDriver::ConstructFrame()
         crc += source[i];
     }
 
-    EthernetFrame frame(preamble, sfd, destination, source, length, crc, data);
-    mFrame = frame;
+    std::shared_ptr<EthernetFrame> frame = make_shared<EthernetFrame>(preamble, sfd, destination, source, length, crc, data);
 
-    return mFrame;
+    return frame;
     
 }
 
 //Sends the frame if CRC values are the same.
-bool EthernetDriver::SendFrame(EthernetFrame frame)
+bool EthernetDriver::SendFrame(std::shared_ptr<EthernetFrame> frame)
 {
     
 
-    if (mFrame.GetCRC() == frame.GetCRC())
+    if (mFrame->GetCRC() == mDevice->GetCRC())
     {
          
          cout << "Sending command from Host to Device" << endl;
@@ -88,12 +96,13 @@ void EthernetDriver::Respond()
 
 
 // Once verified that the response has happened stream the data from the host
-void EthernetDriver::StreamMessage(EthernetFrame frame)
+void EthernetDriver::StreamMessage(std::shared_ptr<EthernetFrame> frame)
 {
     cout << "Message from host: ";
-   for (auto byte : frame.GetData())
+   for (auto byte : frame->GetData())
    {
         cout << +byte;
    }
+   cout << endl;
    cout << endl;
 }
